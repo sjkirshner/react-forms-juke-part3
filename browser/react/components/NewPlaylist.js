@@ -4,13 +4,14 @@ import Songs from '../components/Songs';
 
 export default class NewPlaylist extends Component {
 
-  constructor () {
-    super();
+  constructor (props) {
+    super(props);
     this.state = {
       input: "",
       dirty: false
     };
-
+    //const hello = typeOf props.addNewPlaylist;
+    console.log("Inside NewPlaylist: ", props);
     this.handleChange = this.handleChange.bind(this);
     this.submitPlaylistTitle = this.submitPlaylistTitle.bind(this)
   }
@@ -28,11 +29,7 @@ export default class NewPlaylist extends Component {
 
   submitPlaylistTitle (event) {
     event.preventDefault();
-    axios.post('/api/playlists', { name: this.state.input })
-    .then(res => res.data)
-    .then(result => {
-      console.log(result) // response json from the server!
-    });
+    this.props.addPlaylist(this.state.input); 
     this.setState({ input: '', dirty: false});
   }
 
