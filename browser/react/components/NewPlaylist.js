@@ -7,7 +7,8 @@ export default class NewPlaylist extends Component {
   constructor () {
     super();
     this.state = {
-      input: ""
+      input: "",
+      dirty: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -22,18 +23,24 @@ export default class NewPlaylist extends Component {
 
   handleChange (event) {
     this.setState({ input: event.target.value });
-
+    this.setState({ dirty: true})
   }
 
   submitPlaylistTitle (event) {
     event.preventDefault();
-    console.log("You have submitted me! Hi! ", this.state.input);
-    this.setState({ input: ''});
+    axios.post('/api/playlists', { name: this.state.input })
+    .then(res => res.data)
+    .then(result => {
+      console.log(result) // response json from the server!
+    });
+    this.setState({ input: '', dirty: false});
   }
 
 
   render () {
-    const isSubmitDisabled = this.state.input.length > 16 ? true : false;
+    const isTitleTooLong = this.state.input.length > 16;
+    const isTitleBlank = this.state.input.length < 1;
+    const isSubmitDisabled = isTitleBlank || isTitleTooLong;
     return (
       <div className="well">
       <form className="form-horizontal" onChange={this.handleChange} onSubmit={this.submitPlaylistTitle}>
@@ -48,6 +55,8 @@ export default class NewPlaylist extends Component {
           <div className="form-group">
             <div className="col-xs-10 col-xs-offset-2">
               <button type="submit" disabled={isSubmitDisabled} className="btn btn-success">Create Playlist</button>
+              {this.state.dirty && isTitleBlank && <div className="alert alert-warning">Please enter a name</div>}
+              {isTitleTooLong && <div className="alert alert-warning">Please enter less than 16 characters</div>}
             </div>
           </div>
         </fieldset>
